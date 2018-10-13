@@ -1,0 +1,8 @@
+{
+    "dependencies": [],
+    "description": "Black - the uncompromising Python code formatter for Sublimetext",
+    "url": "",
+    "version": "0.0.1",
+    "platforms": ["*"],
+    "sublime_text": ">=3000"
+}

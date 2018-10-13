@@ -1,0 +1,3 @@
+[
+    { "caption": "Black: Reformat file", "command": "black" },
+]
