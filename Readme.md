@@ -14,6 +14,6 @@ url: https://github.com/stlehmann/sublime-black
 ## Usage
 
 Simply open a Python file that you want to reformat. Then choose the command
-**Black** and it will be reformatted.
+**Black: reformat file** and it will be reformatted.
 
 [0]: https://github.com/ambv/black

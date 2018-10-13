@@ -5,16 +5,23 @@ import os
 
 
 class BlackCommand(sublime_plugin.TextCommand):
+    """Black command for reformatting."""
+
     def run(self, edit):
-        envs = os.environ.copy()
+
+        # get the filename for the current view
         window = sublime.active_window()
         view = window.active_view()
-        print(view.file_name())
+        file_name = view.file_name()
+
+        envs = os.environ.copy()
+
         p = subprocess.Popen(
-            ["black", view.file_name()],
+            ["black", file_name],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             env=envs,
         )
-        print(p.communicate())
+
+        p.communicate()
