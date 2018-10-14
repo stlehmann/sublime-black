@@ -7,6 +7,10 @@ import os
 class BlackCommand(sublime_plugin.TextCommand):
     """Black command for reformatting."""
 
+    def is_enabled(self):
+        current_file = sublime.active_window().active_view().file_name()
+        return current_file.endswith((".py", ".pyw"))
+
     def run(self, edit):
 
         # get the filename for the current view
