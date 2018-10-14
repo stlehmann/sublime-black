@@ -8,8 +8,16 @@ class BlackCommand(sublime_plugin.TextCommand):
     """Black command for reformatting."""
 
     def is_enabled(self):
-        current_file = sublime.active_window().active_view().file_name()
-        return current_file.endswith((".py", ".pyw"))
+        try:
+            current_file = sublime.active_window().active_view().file_name()
+            return current_file.endswith((".py", ".pyw"))
+        except AttributeError:
+            # catch AttributeError if sublime.active_window or active_view or file_name
+            # are None, which can happen if there is no active window or no open file or
+            # even if the current file has not been saved, yet
+            pass
+
+        return False
 
     def run(self, edit):
 
