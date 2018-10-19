@@ -12,7 +12,7 @@
                 "children":
                 [
                     {
-                        "caption": "Python PEP8 Autoformat",
+                        "caption": "Sublime Black",
                         "children":
                         [
                             {
