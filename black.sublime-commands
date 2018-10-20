@@ -1,3 +1,4 @@
 [
-    { "caption": "Black: Reformat file", "command": "black" },
+    { "caption": "Black: Reformat file", "command": "black_reformat" },
+    { "caption": "Black: Show diffs", "command": "black_diff"}
 ]
