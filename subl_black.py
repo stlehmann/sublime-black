@@ -10,16 +10,23 @@ SETTINGS = "SublimeBlack.sublime-settings"
 logger = logging.getLogger(__name__)
 
 
-class Settings:
+def plugin_loaded():
+    print("SublimeBlack loaded")
 
+
+class Settings:
     def __init__(self):
         try:
             self._settings = sublime.load_settings(SETTINGS)
         except Exception:
+            self._settings = None
             logger.error("Could not load settings")
 
     def __getitem__(self, key):
-        return self._settings.get(key)
+        if self._settings:
+            return self._settings.get(key)
+        else:
+            return None
 
 
 class BlackCommand(sublime_plugin.TextCommand):
