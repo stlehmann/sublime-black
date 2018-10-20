@@ -13,7 +13,10 @@ logger = logging.getLogger(__name__)
 class Settings:
 
     def __init__(self):
-        self._settings = sublime.load_settings(SETTINGS)
+        try:
+            self._settings = sublime.load_settings(SETTINGS)
+        except Exception:
+            logger.error("Could not load settings")
 
     def __get__(self, key):
         return self._settings.get(key)
