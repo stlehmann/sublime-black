@@ -77,10 +77,46 @@ class Settings:
             return None
 
 
-class black_reformat(sublime_plugin.TextCommand):
-    """Black command for reformatting."""
+def black_shell_cmd(diff=False):
+    """Return shell command with arguments for executing Black."""
+    settings = Settings()
+    # get the filename for the current view
+    try:
+        current_file = sublime.active_window().active_view().file_name()
+    except AttributeError as e:
+        logger.error(str(e))
+        return
+
+    args = []
+
+    # only show diff
+    if diff:
+        args += ["-D"]
+
+    # line length: set maximum line length
+    if settings["line_length"] is not None:
+        args += ["-l{0}".format(settings["line_length"])]
+
+    # py36: Allow using Python 3.6 syntax
+    if settings["py36"]:
+        args += ["--py36"]
+
+    # skip_string_normalization: Don't normalize string quotes or prefixes
+    if settings["skip_string_normalization"]:
+        args += ["-S"]
+
+    # skip_numeric_underscore_normalization: Don't normalize numeric underscores
+    if settings["skip_numeric_underscore_normalization"]:
+        args += ["-N"]
+
+    return ["black", current_file] + args
+
+
+class SublimeBlackCommandMixin:
+    """Mixin for commands used with SublimeBlack."""
 
     def is_enabled(self):
+        """Only enable Command if current file is a Python file."""
         try:
             current_file = sublime.active_window().active_view().file_name()
             return current_file.endswith((".py", ".pyw"))
@@ -93,45 +129,34 @@ class black_reformat(sublime_plugin.TextCommand):
 
         return False
 
+
+class black_reformat(SublimeBlackCommandMixin, sublime_plugin.TextCommand):
+    """Black command for reformatting."""
+
     def run(self, edit):
-        settings = Settings()
-        # get the filename for the current view
-        try:
-            current_file = sublime.active_window().active_view().file_name()
-        except AttributeError as e:
-            logger.error(str(e))
-            return
-
-        envs = os.environ.copy()
-        args = []
-
-        # line length: set maximum line length
-        if settings["line_length"] is not None:
-            args += ["-l{0}".format(settings["line_length"])]
-
-        # py36: Allow using Python 3.6 syntax
-        if settings["py36"]:
-            args += ["--py36"]
-
-        # skip_string_normalization: Don't normalize string quotes or prefixes
-        if settings["skip_string_normalization"]:
-            args += ["-S"]
-
-        # skip_numeric_underscore_normalization: Don't normalize numeric underscores
-        if settings["skip_numeric_underscore_normalization"]:
-            args += ["-N"]
-
         p = subprocess.Popen(
-            ["black", current_file] + args,
+            black_shell_cmd(diff=False),
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            env=envs,
+            env=os.environ.copy(),
         )
 
         stdout, stderr = p.communicate()
         logger.debug("{0}, {1}".format(stdout, stderr))
 
 
-class black_diff(sublime_plugin.TextCommand):
-    pass
+class black_diff(SublimeBlackCommandMixin, sublime_plugin.TextCommand):
+    """Black command for showing difference after formatting."""
+
+    def run(self, edit):
+        p = subprocess.Popen(
+            black_shell_cmd(diff=True),
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            env=os.environ.copy(),
+        )
+
+        stdout, stderr = p.communicate()
+        print(stdout)
